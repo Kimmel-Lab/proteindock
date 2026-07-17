@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProteinDock</title>
+<meta name="description" content="A physics-informed layer for improving protein-protein docking reliability.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A7%AC%3C/text%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #0f172a;
+    --muted: #64748b;
+    --accent: #0f766e;
+    --accent-hover: #115e59;
+    --border: #e2e8f0;
+    --card: #f8fafc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0b0f14;
+      --fg: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #5eead4;
+      --accent-hover: #99f6e4;
+      --border: #1e293b;
+      --card: #111827;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 6rem 1.5rem 4rem;
+  }
+  header {
+    margin-bottom: 3rem;
+  }
+  .eyebrow {
+    color: var(--accent);
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  h1 {
+    font-size: clamp(2.4rem, 6vw, 3.5rem);
+    line-height: 1.1;
+    margin: 0 0 1rem;
+    letter-spacing: -0.02em;
+  }
+  .tagline {
+    color: var(--muted);
+    font-size: 1.15rem;
+    margin: 0 0 2rem;
+    max-width: 32em;
+  }
+  .cta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 3.5rem;
+  }
+  a.btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.7rem 1.2rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+    transition: background 0.15s, border-color 0.15s;
+  }
+  a.btn.primary {
+    background: var(--accent);
+    color: var(--bg);
+  }
+  a.btn.primary:hover { background: var(--accent-hover); }
+  a.btn.ghost {
+    border: 1px solid var(--border);
+    color: var(--fg);
+  }
+  a.btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
+  section {
+    margin-bottom: 2.5rem;
+  }
+  h2 {
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 1rem;
+    font-weight: 600;
+  }
+  p { margin: 0 0 1rem; }
+  .modes {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 560px) {
+    .modes { grid-template-columns: 1fr 1fr; }
+  }
+  .mode {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1.1rem 1.2rem;
+  }
+  .mode h3 {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+    color: var(--accent);
+  }
+  .mode p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+  footer {
+    margin-top: 4rem;
+    padding-top: 2rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  footer a { color: var(--muted); }
+  footer a:hover { color: var(--accent); }
+  code {
+    background: var(--card);
+    padding: 0.1rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Manuscript in preparation</div>
+    <h1>ProteinDock</h1>
+    <p class="tagline">A physics-informed layer for improving protein–protein docking reliability, built on Rosetta.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="https://github.com/Kimmel-Lab/proteindock">View on GitHub</a>
+      <a class="btn ghost" href="mailto:kimmel.85@osu.edu">Contact</a>
+    </div>
+  </header>
+
+  <section>
+    <h2>Two modes</h2>
+    <div class="modes">
+      <div class="mode">
+        <h3>Mode 1 · Docking layer</h3>
+        <p>Refines physics-based docking with pre-relax and a reweighted <code>fa_elec × 1.5</code> score function.</p>
+      </div>
+      <div class="mode">
+        <h3>Mode 2 · Scoring layer</h3>
+        <p>Reranks foundation-model predictions (AlphaFold3, Boltz-2) by Rosetta interface energy.</p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Kimmel Lab · The Ohio State University ·
+    <a href="https://github.com/Kimmel-Lab/proteindock">GitHub</a>
+  </footer>
+</div>
+</body>
+</html>
