@@ -35,8 +35,7 @@ A `CITATION.cff` file will be added on the first tagged release.
 
 ## Contact
 
-Questions about the method → [gowrish.rajagopal@gmail.com](mailto:gowrish.rajagopal@gmail.com)
-Correspondence → Blaise R. Kimmel, PhD ([kimmel.85@osu.edu](mailto:kimmel.85@osu.edu))
+Blaise R. Kimmel, PhD ([kimmel.85@osu.edu](mailto:kimmel.85@osu.edu))
 
 ## License
 
