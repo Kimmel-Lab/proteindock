@@ -3,177 +3,780 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ProteinDock</title>
-<meta name="description" content="A physics-informed layer for improving protein-protein docking reliability.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%A7%AC%3C/text%3E%3C/svg%3E">
+<title>ProteinDock — a physics-informed layer for protein–protein docking</title>
+<meta name="description" content="ProteinDock is a physics-informed layer for Rosetta that improves protein–protein docking reliability, especially on antibody–antigen interfaces.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='11' cy='16' r='7' fill='none' stroke='%230f7757' stroke-width='2'/%3E%3Ccircle cx='22' cy='16' r='6' fill='none' stroke='%230f7757' stroke-width='2'/%3E%3C/svg%3E">
+
 <style>
   :root {
-    --bg: #ffffff;
-    --fg: #0f172a;
-    --muted: #64748b;
-    --accent: #0f766e;
-    --accent-hover: #115e59;
-    --border: #e2e8f0;
-    --card: #f8fafc;
+    --ground: #f5f5f0;
+    --ground-2: #eeeee6;
+    --ink: #131817;
+    --ink-soft: #3a413e;
+    --muted: #6f7773;
+    --rule: #c9ccc4;
+    --accent: #0f7757;
+    --accent-ink: #ffffff;
+    --highlight: #c78530;
+    --field: rgba(15, 119, 87, 0.15);
+    --field-strong: rgba(15, 119, 87, 0.45);
   }
   @media (prefers-color-scheme: dark) {
     :root {
-      --bg: #0b0f14;
-      --fg: #e2e8f0;
-      --muted: #94a3b8;
-      --accent: #5eead4;
-      --accent-hover: #99f6e4;
-      --border: #1e293b;
-      --card: #111827;
+      --ground: #0d1114;
+      --ground-2: #131a1c;
+      --ink: #e8ebe7;
+      --ink-soft: #b8beb9;
+      --muted: #7f8783;
+      --rule: #1e2427;
+      --accent: #4bc099;
+      --accent-ink: #0d1114;
+      --highlight: #e4a556;
+      --field: rgba(75, 192, 153, 0.18);
+      --field-strong: rgba(75, 192, 153, 0.55);
     }
   }
+  :root[data-theme="light"] {
+    --ground: #f5f5f0; --ground-2: #eeeee6; --ink: #131817; --ink-soft: #3a413e;
+    --muted: #6f7773; --rule: #c9ccc4; --accent: #0f7757; --accent-ink: #ffffff;
+    --highlight: #c78530; --field: rgba(15,119,87,0.15); --field-strong: rgba(15,119,87,0.45);
+  }
+  :root[data-theme="dark"] {
+    --ground: #0d1114; --ground-2: #131a1c; --ink: #e8ebe7; --ink-soft: #b8beb9;
+    --muted: #7f8783; --rule: #1e2427; --accent: #4bc099; --accent-ink: #0d1114;
+    --highlight: #e4a556; --field: rgba(75,192,153,0.18); --field-strong: rgba(75,192,153,0.55);
+  }
+
   * { box-sizing: border-box; }
   html, body { margin: 0; padding: 0; }
   body {
-    background: var(--bg);
-    color: var(--fg);
+    background: var(--ground);
+    color: var(--ink);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16.5px;
     line-height: 1.55;
     -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    font-variant-numeric: tabular-nums;
   }
-  .wrap {
-    max-width: 720px;
+  .serif {
+    font-family: ui-serif, "New York", "Charter", "Iowan Old Style", Georgia, serif;
+    font-weight: 400;
+    letter-spacing: -0.015em;
+  }
+  .mono {
+    font-family: ui-monospace, "SF Mono", "JetBrains Mono", "IBM Plex Mono", Menlo, Consolas, monospace;
+    font-feature-settings: "ss01", "ss02";
+  }
+
+  .container {
+    max-width: 1120px;
     margin: 0 auto;
-    padding: 6rem 1.5rem 4rem;
+    padding: 0 clamp(1.25rem, 4vw, 3rem);
   }
-  header {
-    margin-bottom: 3rem;
+
+  /* NAV — instrument bar */
+  nav.top {
+    border-bottom: 1px solid var(--rule);
+    background: var(--ground);
+    position: sticky; top: 0; z-index: 10;
+    backdrop-filter: saturate(140%) blur(8px);
   }
-  .eyebrow {
-    color: var(--accent);
-    font-weight: 600;
-    font-size: 0.85rem;
+  nav.top .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1rem; padding-bottom: 1rem;
+    font-size: 0.78rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    margin-bottom: 0.75rem;
   }
-  h1 {
-    font-size: clamp(2.4rem, 6vw, 3.5rem);
-    line-height: 1.1;
-    margin: 0 0 1rem;
-    letter-spacing: -0.02em;
-  }
-  .tagline {
-    color: var(--muted);
-    font-size: 1.15rem;
-    margin: 0 0 2rem;
-    max-width: 32em;
-  }
-  .cta-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-    margin-bottom: 3.5rem;
-  }
-  a.btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.7rem 1.2rem;
-    border-radius: 8px;
+  nav.top .brand {
+    display: flex; align-items: center; gap: 0.5rem;
+    color: var(--ink);
     text-decoration: none;
-    font-weight: 500;
-    font-size: 0.95rem;
-    transition: background 0.15s, border-color 0.15s;
   }
-  a.btn.primary {
-    background: var(--accent);
-    color: var(--bg);
+  nav.top .brand svg { display: block; }
+  nav.top .brand strong {
+    font-weight: 600; letter-spacing: 0.08em;
   }
-  a.btn.primary:hover { background: var(--accent-hover); }
-  a.btn.ghost {
-    border: 1px solid var(--border);
-    color: var(--fg);
+  nav.top .links { display: flex; gap: 1.75rem; }
+  nav.top .links a {
+    color: var(--muted); text-decoration: none;
+    transition: color 0.15s;
   }
-  a.btn.ghost:hover { border-color: var(--accent); color: var(--accent); }
-  section {
-    margin-bottom: 2.5rem;
+  nav.top .links a:hover { color: var(--accent); }
+  nav.top .theme {
+    color: var(--muted); background: none; border: none; cursor: pointer;
+    font: inherit; letter-spacing: 0.08em; padding: 0;
   }
-  h2 {
-    font-size: 1rem;
-    letter-spacing: 0.06em;
+  nav.top .theme:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    padding: clamp(3rem, 8vw, 6rem) 0 clamp(2rem, 5vw, 4rem);
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+    overflow: hidden;
+  }
+  .hero .container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: clamp(2rem, 5vw, 3rem);
+    align-items: center;
+  }
+  @media (min-width: 880px) {
+    .hero .container { grid-template-columns: 1.2fr 1fr; gap: 4rem; }
+  }
+  .hero .eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--muted);
-    margin: 0 0 1rem;
-    font-weight: 600;
+    display: flex; align-items: center; gap: 0.75rem;
+    margin-bottom: 1.5rem;
   }
-  p { margin: 0 0 1rem; }
+  .hero .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--highlight);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--highlight) 25%, transparent);
+  }
+  .hero h1 {
+    font-family: ui-serif, "New York", "Charter", "Iowan Old Style", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2.4rem, 5.5vw, 4.1rem);
+    line-height: 1.02;
+    letter-spacing: -0.02em;
+    margin: 0 0 1.5rem;
+    text-wrap: balance;
+    color: var(--ink);
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero p.lede {
+    font-size: 1.15rem;
+    line-height: 1.5;
+    color: var(--ink-soft);
+    margin: 0 0 2rem;
+    max-width: 34em;
+    text-wrap: pretty;
+  }
+  .cta {
+    display: flex; flex-wrap: wrap; gap: 0.75rem;
+  }
+  .cta a {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    padding: 0.65rem 1.15rem;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    border-radius: 4px;
+    transition: transform 0.12s, background 0.15s, color 0.15s, border-color 0.15s;
+  }
+  .cta a.primary {
+    background: var(--accent); color: var(--accent-ink);
+  }
+  .cta a.primary:hover { transform: translateY(-1px); }
+  .cta a.ghost {
+    border: 1px solid var(--rule); color: var(--ink);
+  }
+  .cta a.ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* HERO VISUAL — electrostatic field between two proteins */
+  .viz {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    max-width: 460px;
+    justify-self: center;
+    width: 100%;
+  }
+  .viz svg { width: 100%; height: 100%; display: block; }
+  .viz .caption {
+    position: absolute;
+    bottom: 0.25rem; right: 0;
+    font-size: 0.7rem;
+    letter-spacing: 0.1em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .viz .caption span { color: var(--highlight); font-weight: 600; }
+
+  /* READOUT — benchmark cells */
+  .readout {
+    padding: clamp(3rem, 6vw, 4.5rem) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .readout .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .readout .head h2 {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+    max-width: 22em;
+  }
+  .readout .head .section-id {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .cells {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    border-bottom: 1px solid var(--rule);
+  }
+  @media (min-width: 720px) {
+    .cells { grid-template-columns: repeat(3, 1fr); }
+  }
+  .cell {
+    padding: 2rem 1.5rem 1.75rem;
+    border-bottom: 1px solid var(--rule);
+    position: relative;
+  }
+  @media (min-width: 720px) {
+    .cell { border-bottom: none; border-right: 1px solid var(--rule); }
+    .cell:last-child { border-right: none; }
+  }
+  .cell:last-child { border-bottom: none; }
+  .cell .label {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+  }
+  .cell .value {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(2.75rem, 5vw, 3.75rem);
+    line-height: 1;
+    letter-spacing: -0.03em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .cell .value .pct { font-size: 0.55em; color: var(--muted); margin-left: 0.15em; }
+  .cell .delta {
+    display: inline-flex; align-items: center; gap: 0.3rem;
+    margin-top: 0.75rem;
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.02em;
+  }
+  .cell .delta.neg { color: var(--muted); }
+  .cell .compared {
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 0.25rem;
+    letter-spacing: 0.02em;
+  }
+
+  /* MODES */
   .modes {
+    padding: clamp(3rem, 6vw, 4.5rem) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .modes .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .modes .head h2 {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+    max-width: 22em;
+  }
+  .modes .head .section-id {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .mode-grid {
+    display: grid;
+    gap: 1.5rem;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 780px) {
+    .mode-grid { grid-template-columns: 1fr 1fr; gap: 2rem; }
+  }
+  .mode {
+    border: 1px solid var(--rule);
+    border-radius: 2px;
+    padding: 1.75rem 1.75rem 1.5rem;
+    background: var(--ground);
+    transition: border-color 0.15s, transform 0.15s;
+    display: flex; flex-direction: column;
+  }
+  .mode:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .mode .tag {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+  .mode h3 {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-weight: 400;
+    font-size: 1.5rem;
+    line-height: 1.15;
+    letter-spacing: -0.015em;
+    margin: 0 0 0.75rem;
+  }
+  .mode p {
+    color: var(--ink-soft);
+    margin: 0 0 1.25rem;
+    font-size: 0.98rem;
+  }
+  .mode ul.spec {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border-top: 1px solid var(--rule);
+    padding-top: 1rem;
+  }
+  .mode ul.spec li {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.35rem 0;
+    font-size: 0.82rem;
+  }
+  .mode ul.spec li .k { color: var(--muted); letter-spacing: 0.02em; }
+  .mode ul.spec li .v { color: var(--ink); text-align: right; }
+  .mode ul.spec li .v code {
+    background: var(--ground-2);
+    padding: 0.05rem 0.35rem;
+    border-radius: 3px;
+    font-size: 0.85em;
+    color: var(--ink);
+  }
+
+  /* RECIPE */
+  .recipe {
+    padding: clamp(3rem, 6vw, 4.5rem) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .recipe .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 2.5rem;
+  }
+  .recipe .head h2 {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    letter-spacing: -0.015em;
+    margin: 0;
+    text-wrap: balance;
+  }
+  .recipe .head .section-id {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .steps {
+    display: grid;
+    gap: 0;
+    grid-template-columns: 1fr;
+  }
+  @media (min-width: 780px) {
+    .steps { grid-template-columns: 44px 1fr 1fr; }
+  }
+  .step {
+    display: contents;
+  }
+  .step .n {
+    font-size: 0.75rem;
+    letter-spacing: 0.14em;
+    color: var(--accent);
+    padding: 1.25rem 0 0.75rem;
+    border-top: 1px solid var(--rule);
+  }
+  .step .what {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-size: 1.15rem;
+    padding: 1.25rem 0 1.25rem;
+    border-top: 1px solid var(--rule);
+    letter-spacing: -0.01em;
+  }
+  .step .how {
+    color: var(--ink-soft);
+    padding: 1.25rem 0 1.25rem;
+    border-top: 1px solid var(--rule);
+    font-size: 0.95rem;
+  }
+  .step .how code {
+    background: var(--ground-2);
+    padding: 0.05rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.9em;
+    color: var(--accent);
+    font-weight: 500;
+  }
+  .step:last-child .n,
+  .step:last-child .what,
+  .step:last-child .how {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  /* CITE */
+  .cite {
+    padding: clamp(3rem, 6vw, 4.5rem) 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .cite .head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; flex-wrap: wrap;
+    margin-bottom: 1.75rem;
+  }
+  .cite .head h2 {
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-weight: 400;
+    font-size: clamp(1.5rem, 2.8vw, 2rem);
+    letter-spacing: -0.015em;
+    margin: 0;
+  }
+  .cite .head .section-id {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .cite blockquote {
+    margin: 0;
+    padding: 1.5rem 1.75rem;
+    border-left: 2px solid var(--accent);
+    background: var(--ground-2);
+    font-family: ui-serif, "New York", "Charter", Georgia, serif;
+    font-size: 1.05rem;
+    line-height: 1.5;
+    color: var(--ink);
+    max-width: 44em;
+  }
+  .cite blockquote .authors { display: block; margin-bottom: 0.35rem; }
+  .cite blockquote .title { font-style: italic; }
+
+  /* FOOTER — spec plate */
+  footer.plate {
+    padding: 2rem 0 3rem;
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+  }
+  footer.plate .container {
     display: grid;
     gap: 1rem;
     grid-template-columns: 1fr;
-  }
-  @media (min-width: 560px) {
-    .modes { grid-template-columns: 1fr 1fr; }
-  }
-  .mode {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 10px;
-    padding: 1.1rem 1.2rem;
-  }
-  .mode h3 {
-    margin: 0 0 0.4rem;
-    font-size: 1rem;
-    color: var(--accent);
-  }
-  .mode p {
-    margin: 0;
     color: var(--muted);
-    font-size: 0.9rem;
   }
-  footer {
-    margin-top: 4rem;
-    padding-top: 2rem;
-    border-top: 1px solid var(--border);
+  @media (min-width: 720px) {
+    footer.plate .container {
+      grid-template-columns: repeat(4, 1fr);
+    }
+  }
+  footer.plate .col .k {
+    display: block;
+    text-transform: uppercase;
+    font-size: 0.68rem;
+    letter-spacing: 0.14em;
     color: var(--muted);
-    font-size: 0.85rem;
+    margin-bottom: 0.35rem;
   }
-  footer a { color: var(--muted); }
-  footer a:hover { color: var(--accent); }
-  code {
-    background: var(--card);
-    padding: 0.1rem 0.35rem;
-    border-radius: 4px;
-    font-size: 0.9em;
+  footer.plate .col .v { color: var(--ink); }
+  footer.plate a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--rule); }
+  footer.plate a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+  /* SVG interactions */
+  .field-line { stroke: var(--field-strong); stroke-width: 0.8; fill: none; opacity: 0.85; }
+  .protein-a, .protein-b {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.2;
+  }
+  .protein-fill-a { fill: var(--ground-2); opacity: 0.85; }
+  .protein-fill-b { fill: var(--ground-2); opacity: 0.85; }
+  .charge-plus { fill: var(--highlight); }
+  .charge-minus { fill: var(--accent); }
+  .interface-line { stroke: var(--accent); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.9; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .field-line, .charge-plus, .charge-minus { animation: none !important; }
+  }
+
+  /* focus */
+  a:focus-visible, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
   }
 </style>
 </head>
+
 <body>
-<div class="wrap">
-  <header>
-    <div class="eyebrow">Manuscript in preparation</div>
-    <h1>ProteinDock</h1>
-    <p class="tagline">A physics-informed layer for improving protein–protein docking reliability, built on Rosetta.</p>
-    <div class="cta-row">
-      <a class="btn primary" href="https://github.com/Kimmel-Lab/proteindock">View on GitHub</a>
-      <a class="btn ghost" href="mailto:kimmel.85@osu.edu">Contact</a>
-    </div>
-  </header>
 
-  <section>
-    <h2>Two modes</h2>
-    <div class="modes">
-      <div class="mode">
-        <h3>Mode 1 · Docking layer</h3>
-        <p>Refines physics-based docking with pre-relax and a reweighted <code>fa_elec × 1.5</code> score function.</p>
+<nav class="top">
+  <div class="container">
+    <a class="brand mono" href="/">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <circle cx="9" cy="12" r="5" stroke="currentColor" stroke-width="1.5"/>
+        <circle cx="16" cy="12" r="4" stroke="currentColor" stroke-width="1.5"/>
+      </svg>
+      <strong>PROTEINDOCK</strong>
+    </a>
+    <div class="links mono">
+      <a href="#results">Results</a>
+      <a href="#modes">Modes</a>
+      <a href="#recipe">Method</a>
+      <a href="#cite">Cite</a>
+      <a href="https://github.com/Kimmel-Lab/proteindock" target="_blank" rel="noopener">GitHub ↗</a>
+    </div>
+    <button class="theme mono" id="theme-toggle" aria-label="Toggle theme">◐</button>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="container">
+    <div class="hero-copy">
+      <div class="eyebrow mono">
+        <span class="dot" aria-hidden="true"></span>
+        v0.1 · Manuscript in preparation
       </div>
-      <div class="mode">
-        <h3>Mode 2 · Scoring layer</h3>
-        <p>Reranks foundation-model predictions (AlphaFold3, Boltz-2) by Rosetta interface energy.</p>
+      <h1 class="serif">
+        A physics-informed layer for <em>protein–protein docking</em>.
+      </h1>
+      <p class="lede">
+        ProteinDock is a lightweight Rosetta layer that lifts top-1 docking reliability across
+        general protein–protein and antibody–antigen benchmarks — with a pre-relax step, a single
+        <span class="mono" style="color:var(--accent);font-weight:600">fa_elec × 1.5</span>
+        reweight, and interface-aware refinement. No new score function. No new sampler.
+      </p>
+      <div class="cta">
+        <a class="primary mono" href="https://github.com/Kimmel-Lab/proteindock" target="_blank" rel="noopener">
+          Open on GitHub →
+        </a>
+        <a class="ghost mono" href="#recipe">See the method</a>
       </div>
     </div>
-  </section>
 
-  <footer>
-    Kimmel Lab · The Ohio State University ·
-    <a href="https://github.com/Kimmel-Lab/proteindock">GitHub</a>
-  </footer>
-</div>
+    <div class="viz" aria-hidden="true">
+      <svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+        <!-- Field lines: curved paths suggesting electrostatic field between two masses -->
+        <g>
+          <path class="field-line" d="M 130,120 C 180,140 220,140 270,120" style="animation: pulse 5s ease-in-out infinite">
+            <animate attributeName="stroke-dashoffset" from="0" to="20" dur="4s" repeatCount="indefinite"/>
+          </path>
+          <path class="field-line" d="M 120,160 C 180,180 220,180 280,160" style="animation-delay: 0.4s"/>
+          <path class="field-line" d="M 115,200 C 180,220 220,220 285,200"/>
+          <path class="field-line" d="M 120,240 C 180,260 220,260 280,240"/>
+          <path class="field-line" d="M 130,280 C 180,300 220,300 270,280"/>
+        </g>
+
+        <!-- Protein A (left) -->
+        <path class="protein-fill-a" d="M 60,200 C 60,140 100,90 155,95 C 195,98 200,140 180,180 C 175,190 175,210 180,220 C 200,260 195,302 155,305 C 100,310 60,260 60,200 Z"/>
+        <path class="protein-a" d="M 60,200 C 60,140 100,90 155,95 C 195,98 200,140 180,180 C 175,190 175,210 180,220 C 200,260 195,302 155,305 C 100,310 60,260 60,200 Z"/>
+
+        <!-- Protein B (right) -->
+        <path class="protein-fill-b" d="M 340,200 C 340,140 300,90 245,95 C 205,98 200,140 220,180 C 225,190 225,210 220,220 C 200,260 205,302 245,305 C 300,310 340,260 340,200 Z"/>
+        <path class="protein-b" d="M 340,200 C 340,140 300,90 245,95 C 205,98 200,140 220,180 C 225,190 225,210 220,220 C 200,260 205,302 245,305 C 300,310 340,260 340,200 Z"/>
+
+        <!-- Interface line -->
+        <line class="interface-line" x1="200" y1="98" x2="200" y2="302"/>
+
+        <!-- Charges on protein A (positive, highlighted) -->
+        <circle class="charge-plus" cx="130" cy="160" r="4"/>
+        <circle class="charge-plus" cx="145" cy="210" r="4"/>
+        <circle class="charge-plus" cx="130" cy="255" r="4"/>
+
+        <!-- Charges on protein B (negative, accent) -->
+        <circle class="charge-minus" cx="270" cy="150" r="4"/>
+        <circle class="charge-minus" cx="255" cy="200" r="4"/>
+        <circle class="charge-minus" cx="270" cy="250" r="4"/>
+
+        <!-- Labels -->
+        <text x="98" y="85" class="mono" font-size="11" fill="var(--muted)" letter-spacing="1">CHAIN A</text>
+        <text x="272" y="85" class="mono" font-size="11" fill="var(--muted)" letter-spacing="1">CHAIN B</text>
+
+        <!-- fa_elec label with highlight -->
+        <line x1="200" y1="335" x2="200" y2="360" stroke="var(--highlight)" stroke-width="1"/>
+        <text x="200" y="378" class="mono" font-size="11" fill="var(--highlight)" text-anchor="middle" letter-spacing="1.5" font-weight="600">fa_elec × 1.5</text>
+
+        <!-- Corner tick marks (instrument plate) -->
+        <g stroke="var(--rule)" stroke-width="1" fill="none">
+          <path d="M 8,8 L 8,20 M 8,8 L 20,8"/>
+          <path d="M 392,8 L 392,20 M 392,8 L 380,8"/>
+          <path d="M 8,392 L 8,380 M 8,392 L 20,392"/>
+          <path d="M 392,392 L 392,380 M 392,392 L 380,392"/>
+        </g>
+      </svg>
+      <div class="caption mono">
+        Interface / <span>fa_elec × 1.5</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="readout" id="results">
+  <div class="container">
+    <div class="head">
+      <h2 class="serif">Top-1 success rate across three benchmarks.</h2>
+      <div class="section-id mono">§ 01 — Readout</div>
+    </div>
+    <div class="cells">
+      <div class="cell">
+        <div class="label mono">DB5.5 · General PPI</div>
+        <div class="value serif">80.2<span class="pct">%</span></div>
+        <div class="delta">▲ +32.8 pts</div>
+        <div class="compared mono">vs vanilla Rosetta 47.4%</div>
+      </div>
+      <div class="cell">
+        <div class="label mono">SAbDab-v3 · Antibody–Antigen</div>
+        <div class="value serif">74.1<span class="pct">%</span></div>
+        <div class="delta">▲ +8.6 pts</div>
+        <div class="compared mono">vs vanilla Rosetta 65.5%</div>
+      </div>
+      <div class="cell">
+        <div class="label mono">novel-50 · Post-AF3 Ab–Ag</div>
+        <div class="value serif">100<span class="pct">%</span></div>
+        <div class="delta">▲ +2.0 pts</div>
+        <div class="compared mono">vs vanilla Rosetta 98.0%</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="modes" id="modes">
+  <div class="container">
+    <div class="head">
+      <h2 class="serif">Two modes. Same recipe.</h2>
+      <div class="section-id mono">§ 02 — Modes</div>
+    </div>
+    <div class="mode-grid">
+
+      <div class="mode">
+        <div class="tag mono">Mode 1 — Docking layer</div>
+        <h3 class="serif">Refines physics-based docking on chain inputs.</h3>
+        <p>Drop in as a layer over Rosetta's docking protocol. FastRelax each monomer, run local rigid-body sampling with an <code>fa_elec × 1.5</code>-reweighted REF2015, refine the interface, select top-1.</p>
+        <ul class="spec">
+          <li><span class="k mono">Inputs</span>       <span class="v mono">2 chain PDBs</span></li>
+          <li><span class="k mono">Sampler</span>      <span class="v mono">Rosetta local dock</span></li>
+          <li><span class="k mono">Score</span>        <span class="v"><code>REF2015 · fa_elec × 1.5</code></span></li>
+          <li><span class="k mono">Selection</span>    <span class="v mono">Top-1 by I_sc</span></li>
+        </ul>
+      </div>
+
+      <div class="mode">
+        <div class="tag mono">Mode 2 — Scoring layer</div>
+        <h3 class="serif">Reranks foundation-model predictions.</h3>
+        <p>Take pose candidates from AlphaFold3 and Boltz-2, rescore by Rosetta interface energy under the same electrostatic reweight, and arbitrate across predictors. No re-sampling; a truncated ProteinDock scoring pass.</p>
+        <ul class="spec">
+          <li><span class="k mono">Inputs</span>       <span class="v mono">AF3 · Boltz-2 poses</span></li>
+          <li><span class="k mono">Sampler</span>      <span class="v mono">none (score-only)</span></li>
+          <li><span class="k mono">Metric</span>       <span class="v"><code>dG_interface</code></span></li>
+          <li><span class="k mono">Selection</span>    <span class="v mono">Cross-predictor argmin</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="recipe" id="recipe">
+  <div class="container">
+    <div class="head">
+      <h2 class="serif">The recipe — three deliberate changes.</h2>
+      <div class="section-id mono">§ 03 — Method</div>
+    </div>
+    <div class="steps">
+      <div class="step">
+        <div class="n mono">01</div>
+        <div class="what serif">Pre-relax each monomer.</div>
+        <div class="how">
+          Independent <code>FastRelax</code> on each chain before docking. Removes internal strain that would otherwise force docking search away from the true basin.
+        </div>
+      </div>
+      <div class="step">
+        <div class="n mono">02</div>
+        <div class="what serif">Local docking under a reweighted score.</div>
+        <div class="how">
+          Rosetta's local dock with <code>fa_elec × 1.5</code>. The 50 % boost to the electrostatic term recovers the polar, charge-driven interfaces that vanilla REF2015 systematically under-selects.
+        </div>
+      </div>
+      <div class="step">
+        <div class="n mono">03</div>
+        <div class="what serif">Interface refinement and top-1 selection.</div>
+        <div class="how">
+          All-atom side-chain refinement across the interface, then top-1 by interface energy (<code>I_sc</code>). No ensembles, no oracles, no reranker post-hoc.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="cite" id="cite">
+  <div class="container">
+    <div class="head">
+      <h2 class="serif">Cite</h2>
+      <div class="section-id mono">§ 04 — Reference</div>
+    </div>
+    <blockquote>
+      <span class="authors">Rajagopal, G., Spina, S. C., Bailey Jr., J. S., &amp; Kimmel, B. R. (2026).</span>
+      <span class="title">ProteinDock: A physics-informed layer to improve protein–protein docking reliability.</span>
+      Manuscript in preparation.
+    </blockquote>
+  </div>
+</section>
+
+<footer class="plate">
+  <div class="container">
+    <div class="col mono">
+      <span class="k">Lab</span>
+      <span class="v"><a href="mailto:kimmel.85@osu.edu">Kimmel Lab · OSU</a></span>
+    </div>
+    <div class="col mono">
+      <span class="k">Repository</span>
+      <span class="v"><a href="https://github.com/Kimmel-Lab/proteindock" target="_blank" rel="noopener">Kimmel-Lab/proteindock</a></span>
+    </div>
+    <div class="col mono">
+      <span class="k">License</span>
+      <span class="v">To be issued on release</span>
+    </div>
+    <div class="col mono">
+      <span class="k">Contact</span>
+      <span class="v"><a href="mailto:kimmel.85@osu.edu">kimmel.85@osu.edu</a></span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  (function () {
+    const root = document.documentElement;
+    const btn = document.getElementById('theme-toggle');
+    const stored = localStorage.getItem('pd-theme');
+    if (stored === 'dark' || stored === 'light') root.setAttribute('data-theme', stored);
+    btn.addEventListener('click', () => {
+      const isDark = getComputedStyle(root).getPropertyValue('--ground').trim().startsWith('#0');
+      const current = root.getAttribute('data-theme') || (isDark ? 'dark' : 'light');
+      const next = current === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+      localStorage.setItem('pd-theme', next);
+    });
+  })();
+</script>
+
 </body>
 </html>
