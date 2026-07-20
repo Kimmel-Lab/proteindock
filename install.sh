@@ -38,11 +38,19 @@ pip install --quiet \
   "biopython>=1.83" "numpy" "scipy" \
   "requests" "aiofiles"
 
-# PyRosetta is not on PyPI — install separately per the RosettaCommons license.
+# PyRosetta is deliberately NOT installed by this script.
+# The RosettaCommons license requires each user to obtain PyRosetta directly.
+# The install can finish without it; ProteinDock's UI will load and Mode 2
+# rescoring endpoints work, but any full Mode 1 docking call will fail until
+# PyRosetta is on the PYTHONPATH.
 if ! python -c "import pyrosetta" 2>/dev/null; then
-  warn "PyRosetta not detected. ProteinDock requires PyRosetta (see"
-  warn "  https://www.pyrosetta.org/downloads for a license and wheel)."
-  warn "You can finish the install without it, but docking calls will fail."
+  warn "PyRosetta is not installed — this is intentional."
+  warn "  ProteinDock does not redistribute Rosetta or PyRosetta; the RosettaCommons"
+  warn "  license requires you to obtain them yourself:"
+  warn "    Rosetta:    https://rosettacommons.org/software/download"
+  warn "    PyRosetta:  https://www.pyrosetta.org/downloads"
+  warn "  Once installed, install the PyRosetta wheel into this venv:"
+  warn "    source ${VENV_DIR}/bin/activate && pip install /path/to/pyrosetta-*.whl"
 fi
 
 # --- 4. Stub config.json from example ---
