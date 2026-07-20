@@ -1,10 +1,39 @@
-/** Detect OOD reverse-proxy prefix (e.g. /node/<host>/<port>). Returns "" when running directly. */
-function getBase(): string {
+/** localStorage key used by BackendSettings dialog. */
+const BACKEND_URL_KEY = "proteindock.backendUrl";
+
+/**
+ * Backend URL resolution order:
+ *   1. Explicit URL set by the user via Settings (persisted in localStorage).
+ *      This is the hosted-frontend / self-hosted-backend model.
+ *   2. OSC OnDemand reverse-proxy prefix (/node/<host>/<port>) — legacy same-origin mode.
+ *   3. Empty string — assume backend is on the same origin at "/".
+ */
+export function getBackendUrl(): string {
   if (typeof window === "undefined") return "";
+  try {
+    const stored = window.localStorage.getItem(BACKEND_URL_KEY);
+    if (stored && stored.trim()) return stored.replace(/\/+$/, "");
+  } catch {
+    // ignore storage errors (private mode, quota, etc.)
+  }
   const match = window.location.pathname.match(/^(\/r?node\/[^/]+\/\d+)/);
   return match ? match[1] : "";
 }
-export const BASE = getBase();
+
+export function setBackendUrl(url: string) {
+  const trimmed = url.trim().replace(/\/+$/, "");
+  if (trimmed) {
+    window.localStorage.setItem(BACKEND_URL_KEY, trimmed);
+  } else {
+    window.localStorage.removeItem(BACKEND_URL_KEY);
+  }
+}
+
+/**
+ * BASE is captured at module load. If the user changes the backend URL,
+ * a page reload picks it up — cheap and predictable.
+ */
+export const BASE = getBackendUrl();
 
 export async function fetchPDB(project: string, role: string, pdb: string) {
   const form = new FormData();

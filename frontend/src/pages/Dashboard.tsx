@@ -14,6 +14,7 @@ import {
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { BackendSettings } from '@/components/BackendSettings';
 
 interface ModuleCardProps {
   title: string;
@@ -217,6 +218,7 @@ export default function Dashboard() {
               </p>
             </div>
             <div className="flex items-center gap-3 animate-scale-in">
+              <BackendSettings />
               <ThemeToggle />
               <div className="p-3 rounded-xl bg-primary/10 text-primary shadow-layered">
                 <Beaker className="w-8 h-8" />

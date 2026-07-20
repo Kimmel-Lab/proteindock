@@ -1,42 +1,50 @@
 # ProteinDock
 
-A physics-informed layer for improving protein–protein docking reliability.
+A physics-informed layer for improving protein–protein docking reliability, built on Rosetta.
 
-ProteinDock is a Rosetta-based tool with a modified `ref2015` score function
-(`fa_elec × 1.5`, pre-relaxed monomers) that improves top-1 docking success
-across three benchmarks:
+**Web app**: https://proteindock.com
+**Repo**: this one — hosts the backend source, the frontend source, and install scripts.
 
-| Benchmark          | vanilla Rosetta | ProteinDock |
-| ------------------ | --------------- | ----------- |
-| DB5.5              | 47.4%           | **80.2%**   |
-| SAbDab-v3          | 65.5%           | **74.1%**   |
-| novel-50 (post-AF3 antibody-antigen) | 98.0% | **100%** |
+## How it's deployed
 
-**Two modes:**
+The frontend runs at [proteindock.com](https://proteindock.com). Backends are **user-hosted**: you install this repo on a machine that has PyRosetta + Rosetta available (typically an HPC login node), start the FastAPI server, and paste the URL into the frontend's Settings dialog. Your data never leaves your compute environment.
 
-- **Mode 1** – a refinement layer for physics-based docking tools that take
-  chain-coordinate inputs (pre-relax → local docking with `fa_elec × 1.5`).
-- **Mode 2** – a scoring layer over foundation-model predictions
-  (AlphaFold3, Boltz-2), reranking by Rosetta interface energy.
+## Install (backend)
 
-## Status
+Requires: Python 3.10+, [PyRosetta](https://www.pyrosetta.org/downloads) (licensed separately from RosettaCommons), and a Rosetta build for `rosetta_scripts`.
 
-Pre-release. Code, examples, and installation instructions ship with the paper.
+```bash
+git clone https://github.com/Kimmel-Lab/proteindock.git
+cd proteindock
+./install.sh          # creates venv, installs Python deps
+python configure.py   # interactive: fill Rosetta paths, SLURM account, etc.
+./run.sh              # starts backend on http://0.0.0.0:8000
+```
+
+Then open https://proteindock.com, click the ⚙ Settings icon, and paste your backend URL.
+
+## What it does
+
+**Mode 1 — Docking layer.** Refines physics-based docking with pre-relax and a reweighted `fa_elec × 1.5` score function.
+
+**Mode 2 — Scoring layer.** Reranks foundation-model predictions (AlphaFold3, Boltz-2) by Rosetta interface energy.
+
+## Repo layout
+
+```
+backend/          FastAPI app + pipeline (Python)
+frontend/         React/Vite app (deployed to proteindock.com)
+docs/             Hosted landing page source
+config.example.json   Template config
+install.sh · configure.py · run.sh   One-command backend setup
+```
 
 ## Citation
-
-If you use ProteinDock in your work, please cite:
 
 > Rajagopal, G., Spina, S. C., Bailey Jr., J. S., & Kimmel, B. R. (2026).
 > *ProteinDock: A physics-informed layer to improve protein–protein docking reliability.*
 > Manuscript in preparation.
 
-A `CITATION.cff` file will be added on the first tagged release.
-
 ## Contact
 
 Blaise R. Kimmel, PhD ([kimmel.85@osu.edu](mailto:kimmel.85@osu.edu))
-
-## License
-
-To be added on first tagged release.
