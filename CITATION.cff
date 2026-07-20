@@ -1,0 +1,87 @@
+cff-version: 1.2.0
+message: "If you use ProteinDock in your work, please cite the manuscript below AND the third-party tools ProteinDock calls (Rosetta, PyRosetta) — the RosettaCommons license requires attribution to Rosetta in any publication using it."
+title: "ProteinDock: A physics-informed layer to improve protein-protein docking reliability"
+authors:
+  - family-names: Rajagopal
+    given-names: Gowrish
+    affiliation: "Department of Computer Science and Engineering, The Ohio State University"
+    email: gowrish.rajagopal@gmail.com
+  - family-names: Spina
+    given-names: Søren C.
+    affiliation: "Department of Chemical and Biomolecular Engineering, The Ohio State University"
+  - family-names: "Bailey Jr."
+    given-names: Joseph S.
+    affiliation: "Department of Chemical and Biomolecular Engineering, The Ohio State University"
+  - family-names: Kimmel
+    given-names: Blaise R.
+    affiliation: "Department of Chemical and Biomolecular Engineering, The Ohio State University"
+    email: kimmel.85@osu.edu
+repository-code: "https://github.com/Kimmel-Lab/proteindock"
+url: "https://proteindock.com"
+license: MIT
+preferred-citation:
+  type: article
+  title: "ProteinDock: A physics-informed layer to improve protein-protein docking reliability"
+  authors:
+    - family-names: Rajagopal
+      given-names: Gowrish
+    - family-names: Spina
+      given-names: Søren C.
+    - family-names: "Bailey Jr."
+      given-names: Joseph S.
+    - family-names: Kimmel
+      given-names: Blaise R.
+  year: 2026
+  journal: "Manuscript in preparation"
+
+# Required third-party citations — publications using ProteinDock must also cite the underlying tools.
+references:
+  - type: article
+    title: "ROSETTA3: An object-oriented software suite for the simulation and design of macromolecules"
+    authors:
+      - family-names: Leaver-Fay
+        given-names: Andrew
+    year: 2011
+    journal: "Methods in Enzymology"
+    volume: 487
+    start: 545
+    end: 574
+    doi: "10.1016/B978-0-12-381270-4.00019-6"
+    notes: "Required citation for Rosetta by RosettaCommons Non-Commercial License."
+  - type: article
+    title: "The Rosetta All-Atom Energy Function for Macromolecular Modeling and Design"
+    authors:
+      - family-names: Alford
+        given-names: Rebecca F.
+    year: 2017
+    journal: "Journal of Chemical Theory and Computation"
+    volume: 13
+    issue: 6
+    start: 3031
+    end: 3048
+    doi: "10.1021/acs.jctc.7b00125"
+    notes: "REF2015 score function used by ProteinDock."
+  - type: article
+    title: "PyRosetta: a script-based interface for implementing molecular modeling algorithms using Rosetta"
+    authors:
+      - family-names: Chaudhury
+        given-names: Sidhartha
+    year: 2010
+    journal: "Bioinformatics"
+    volume: 26
+    issue: 5
+    start: 689
+    end: 691
+    doi: "10.1093/bioinformatics/btp698"
+    notes: "Required citation for PyRosetta."
+  - type: article
+    title: "DockQ v2: Improved automatic quality measure for protein multimers, nucleic acids, and small molecules"
+    authors:
+      - family-names: Mirabello
+        given-names: Claudio
+      - family-names: Wallner
+        given-names: Björn
+    year: 2024
+    journal: "Bioinformatics"
+    doi: "10.1093/bioinformatics/btae586"
+    notes: "Scoring engine used throughout ProteinDock evaluation."

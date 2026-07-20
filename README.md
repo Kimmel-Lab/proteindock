@@ -13,6 +13,8 @@ The frontend runs at [proteindock.com](https://proteindock.com). Backends are **
 
 ProteinDock is a thin wrapper. It does **not** bundle or redistribute the tools below — you install them yourself under their own licenses. Full details, download links, and citations are in [`THIRD_PARTY.md`](./THIRD_PARTY.md).
 
+> ⚠ **Non-commercial by default.** Rosetta, PyRosetta, and AlphaFold 3 (if used) are licensed for **non-commercial academic use only**. Commercial use requires separate licenses from **UW CoMotion** (`license@uw.edu`, for Rosetta / PyRosetta) and **Google DeepMind** (`alphafold@google.com`, for AlphaFold 3). ProteinDock itself is MIT — the non-commercial restriction comes from the tools it calls.
+
 | Tool | Purpose | License | Where to get |
 |---|---|---|---|
 | **Rosetta** | Docking engine (`rosetta_scripts`) | RosettaCommons | <https://rosettacommons.org/software/download> |

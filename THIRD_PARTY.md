@@ -5,9 +5,15 @@ scientific tools listed below — you obtain each of them yourself under their
 own license. This is by design: several are non-redistributable under their
 respective agreements.
 
-If you are commissioning or using ProteinDock in a commercial context, verify
-that your organization holds an appropriate commercial license for every tool
-under **"Required"** below.
+> ⚠ **Non-commercial by default.** Rosetta, PyRosetta, and AlphaFold 3 (weights + outputs)
+> are all licensed for non-commercial academic use only. Any commercial use of ProteinDock
+> requires you to independently obtain commercial licenses:
+> - **Rosetta / PyRosetta**: UW CoMotion (`license@uw.edu`)
+> - **AlphaFold 3**: Google DeepMind (`alphafold@google.com`)
+>
+> If you are commissioning or using ProteinDock in a commercial context, verify
+> that your organization holds an appropriate commercial license for every tool
+> under **"Required"** below (and for AlphaFold 3 if you use Mode 2).
 
 ---
 
@@ -42,6 +48,7 @@ under **"Required"** below.
   1. **AlphaFold Server (recommended for most users)** — free, browser-based, no install: <https://alphafoldserver.com/>. Submit your receptor+binder sequences, download the top-ranked model(s), then use ProteinDock's Docking page to upload the resulting PDB as the starting complex. **No GPU or DeepMind approval required.**
   2. **Local AlphaFold 3 install** — required only if you want ProteinDock's backend to auto-generate AF3 predictions (via `backend/af3_predictor.py`). Needs: DeepMind weight-access approval, NVIDIA A100/H100-class GPU, ~200 GB reference databases, the [AF3 repository](https://github.com/google-deepmind/alphafold3), and paths set in `config.json` under an `alphafold3` section.
 - **What Mode 2 actually needs from you**: one PDB per candidate pose. It rescores those poses with Rosetta's interface energy under `fa_elec × 1.5` — no AF3 code or weights ever run inside ProteinDock.
+- **AF3 Output Terms propagate.** PDBs downloaded from AlphaFold Server or produced by a local AF3 install are covered by DeepMind's [AlphaFold 3 Output Terms of Use](https://github.com/google-deepmind/alphafold3/blob/main/OUTPUT_TERMS_OF_USE.md). Those terms follow the pose into every downstream step (including ProteinDock rescoring, publication, and sharing). In practice this means anything you publish or distribute that derives from an AF3 pose stays non-commercial. ProteinDock does not enforce this — you do, by not pushing AF3-derived outputs into a commercial pipeline.
 - **Cite**: Abramson et al., *Nature* 2024
 
 ### Boltz-2
