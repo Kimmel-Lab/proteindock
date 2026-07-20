@@ -17,6 +17,24 @@
 
     <link rel="canonical" href="https://proteindock.com/app/" />
 
+    <!-- SPA fallback receiver: pairs with /404.html at the site root. If we were sent
+         here via /app/?p=/dashboard, restore the URL before React Router boots. -->
+    <script>
+      (function () {
+        var qs = window.location.search;
+        if (qs.length > 1 && qs.indexOf("p=") !== -1) {
+          var params = new URLSearchParams(qs);
+          var p = params.get("p");
+          var q = params.get("q");
+          if (p) {
+            var newPath = "/app" + (p.startsWith("/") ? p : "/" + p);
+            var newSearch = q ? "?" + q : "";
+            window.history.replaceState(null, "", newPath + newSearch + window.location.hash);
+          }
+        }
+      })();
+    </script>
+
     <!-- 3Dmol.js v2.4.2 (local) — BSD-3-Clause — https://github.com/3dmol/3Dmol.js -->
     <script src="3Dmol-min.js?v=2.4.2"></script>
     <script type="module" crossorigin src="/app/assets/index-BfcwYF7s.js"></script>

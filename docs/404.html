@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>ProteinDock</title>
+  <script>
+    // spa-github-pages fallback — captures any unknown path under /app/ and hands it
+    // to the React app so client-side routing can handle it. Anything outside /app/
+    // falls back to the hero page.
+    (function () {
+      var loc = window.location;
+      var path = loc.pathname;
+      if (path === "/app" || path.indexOf("/app/") === 0) {
+        // Rewrite to /app/?p=<original path> so the app can restore the route.
+        var stripped = path.replace(/^\/app\/?/, "/");
+        var qp = "p=" + encodeURIComponent(stripped) + (loc.search ? "&q=" + encodeURIComponent(loc.search.slice(1)) : "");
+        window.location.replace("/app/?" + qp + loc.hash);
+      } else {
+        // Anything else — send to the hero page.
+        window.location.replace("/");
+      }
+    })();
+  </script>
+</head>
+<body>
+  Redirecting…
+</body>
+</html>
