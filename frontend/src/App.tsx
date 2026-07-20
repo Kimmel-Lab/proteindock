@@ -5,10 +5,17 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 
-/** Detect OOD reverse-proxy prefix for React Router basename. */
+/**
+ * React Router basename resolution:
+ *   1. OSC OnDemand reverse-proxy prefix, if present.
+ *   2. Vite's build-time BASE_URL (e.g. "/app/" when deployed to proteindock.com/app,
+ *      "/" for local dev).
+ */
 function getBasename(): string {
-  const match = window.location.pathname.match(/^(\/r?node\/[^/]+\/\d+)/);
-  return match ? match[1] : "/";
+  const oodMatch = window.location.pathname.match(/^(\/r?node\/[^/]+\/\d+)/);
+  if (oodMatch) return oodMatch[1];
+  const base = import.meta.env.BASE_URL || "/";
+  return base.replace(/\/+$/, "") || "/";
 }
 import Dashboard from "./pages/Dashboard";
 import DockingPage from "./pages/DockingPage";
