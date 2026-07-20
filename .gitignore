@@ -1,0 +1,57 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Node / Vite
+node_modules/
+dist/
+.vite/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lockb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+
+# Secrets and local config
+.env
+.env.local
+.env.*.local
+config.json
+!config.example.json
+*.key
+*.pem
+
+# Rosetta outputs / large data
+*.fasc
+*.pdb.gz
+*.silent
+sabdab_data/
+*_slurm.json
+slurm-*.out
+*.sbatch
+
+# Personal / cluster-specific
+config.local.*
+DEVELOPMENT_LOG.md
+IMPROVEMENTS.md
+QUICK_IMPROVEMENTS.md
+MAC_QUICK_FIX.md
+MAC_TROUBLESHOOTING.md
+SETUP_VERIFICATION.md
+UI_IMPROVEMENTS.md
+UI_IMPROVEMENTS_SUMMARY.md

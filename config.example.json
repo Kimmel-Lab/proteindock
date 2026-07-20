@@ -1,0 +1,30 @@
+{
+  "rosetta": {
+    "clean_pdb": "/path/to/rosetta/main/tools/protein_tools/scripts/clean_pdb.py",
+    "rosetta_scripts": "/path/to/rosetta/main/source/bin/rosetta_scripts.static.linuxgccrelease",
+    "database": "/path/to/rosetta/main/database"
+  },
+  "templates": {
+    "docking_xml": "/path/to/docking_full.xml",
+    "docking_options": "/path/to/docking.options.txt",
+    "ala_scan_wt_xml": "/path/to/ala_scan_wt.xml",
+    "ala_scan_mut_xml": "/path/to/ala_scan_mut.xml",
+    "ala_scan_options": "/path/to/ala_scan.options.txt"
+  },
+  "slurm": {
+    "account": "YOUR_ACCOUNT",
+    "default_time": "00:10:00",
+    "default_cpus": 4,
+    "ala_scan_time": "00:30:00",
+    "ala_scan_cpus": 4
+  },
+  "colabfold": {
+    "conda_base": "/path/to/miniconda3",
+    "env_name": "colabfold"
+  },
+  "pymol": {
+    "command": "pymol",
+    "headless_flags": "-cq"
+  },
+  "workdir": null
+}
